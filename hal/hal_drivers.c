@@ -52,11 +52,13 @@ extern void hal_driver_init( void )
     hal_cli_init();
 #endif
 
-
 #if (HAL_KEY_EN > 0)
     hal_key_init();
 #endif
 
+#if (HAL_OWEEPROM_EN > 0)
+    hal_oweeprom_init();
+#endif
 }
 
 /**************************************************************************************************

@@ -48,6 +48,7 @@
 #define SPL_TIMER_SYSTICK_EN                1
 #define SPL_TIMER0_EN                       0
 #define SPL_TIMER1_EN                       0
+#define SPL_OWBUS_EN                        1
 
 #if (SPL_UART_EN > 0)
 #if (SPL_UART0_EN > 0)

@@ -431,6 +431,11 @@
               <FileType>1</FileType>
               <FilePath>..\spl\spl_timer.c</FilePath>
             </File>
+            <File>
+              <FileName>spl_owbus.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\spl\spl_owbus.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>
@@ -460,6 +465,11 @@
               <FileName>hal_key.c</FileName>
               <FileType>1</FileType>
               <FilePath>..\hal\hal_key.c</FilePath>
+            </File>
+            <File>
+              <FileName>hal_oweeprom.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\hal\hal_oweeprom.c</FilePath>
             </File>
           </Files>
         </Group>

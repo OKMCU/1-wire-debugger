@@ -1,6 +1,6 @@
 /*************************************************************************************************
 
- @file  hal_owbus.h
+ @file  spl_owbus.h
 
  @brief 1-wire bus APIs.
 
@@ -14,18 +14,18 @@
  Release Date: 
  **************************************************************************************************/
 
-#ifndef __HAL_OWBUS_H__
-#define __HAL_OWBUS_H__
+#ifndef __SPL_OWBUS_H__
+#define __SPL_OWBUS_H__
 
 #include "stdint.h"
-#include "hal_config.h"
+#include "spl_config.h"
 /**************************************************************************************************
  * Constants
  **************************************************************************************************
  */
-#define HAL_OWBUS_ERR_NONE      0   // no error
-#define HAL_OWBUS_ERR_NOPRS     1   // no presence signal after reset
-
+#define SPL_OWBUS_ERR_NONE      0   // no error
+#define SPL_OWBUS_ERR_NOPRS     1   // no presence signal after reset
+#define SPL_OWBUS_ERR_BUSERR    2   // unexpected bus behaviour
 
 /**************************************************************************************************
  * Macros
@@ -43,15 +43,15 @@
 /**************************************************************************************************
  * Functions
  **************************************************************************************************/
-extern void    hal_owbus_init( void );
+extern void    spl_owbus_init( void );
 
-extern int8_t  hal_owbus_std_reset( void );
-extern void    hal_owbus_std_write( const uint8_t *p_buf, uint16_t len );
-extern void    hal_owbus_std_read( uint8_t *p_buf, uint16_t len );
+extern int8_t  spl_owbus_std_reset( void );
+extern void    spl_owbus_std_write( const uint8_t *p_buf, uint16_t len );
+extern void    spl_owbus_std_read( uint8_t *p_buf, uint16_t len );
 
-extern int8_t  hal_owbus_ovd_reset( void );
-extern void    hal_owbus_ovd_write( const uint8_t *p_buf, uint16_t len );
-extern void    hal_owbus_ovd_read( uint8_t *p_buf, uint16_t len );
+//extern int8_t  spl_owbus_ovd_reset( void );
+//extern void    spl_owbus_ovd_write( const uint8_t *p_buf, uint16_t len );
+//extern void    spl_owbus_ovd_read( uint8_t *p_buf, uint16_t len );
 
 #endif
 

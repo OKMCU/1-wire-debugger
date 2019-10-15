@@ -97,9 +97,36 @@ extern void app_event_cli_process_cmd( char *s )
 #if APP_CLI_CMD_TEST_EN > 0
 static void app_cli_cmd_test( char *p_arg )
 {
+    static HAL_OWEEPROM_ROM_CODE_t rom_code;
+    uint8_t err;
+    
     p_arg = p_arg;
     
     hal_cli_print_str( "TEST\r\n\r\n" );
+
+    err = hal_oweeprom_rom_read( &rom_code );
+    if( err < 0 )
+    {
+        hal_cli_print_str( "Failed to access 1-wire EEPROM\r\n\r\n" );
+        return;
+    }
+    
+    hal_cli_print_str( "Family Code: 0x" );
+    hal_cli_print_hex8( rom_code.family_code );
+    hal_cli_print_str( "\r\n" );
+
+    hal_cli_print_str( "Serial Num: 0x" );
+    hal_cli_print_hex8( rom_code.serial_num[0] );
+    hal_cli_print_hex8( rom_code.serial_num[1] );
+    hal_cli_print_hex8( rom_code.serial_num[2] );
+    hal_cli_print_hex8( rom_code.serial_num[3] );
+    hal_cli_print_hex8( rom_code.serial_num[4] );
+    hal_cli_print_hex8( rom_code.serial_num[5] );
+    hal_cli_print_str( "\r\n" );
+
+    hal_cli_print_str( "CRC Code: 0x" );
+    hal_cli_print_hex8( rom_code.crc_code );
+    hal_cli_print_str( "\r\n" );
 }
 #endif
 
