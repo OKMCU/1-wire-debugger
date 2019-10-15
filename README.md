@@ -1,1 +1,2 @@
-# 1-wire EEPROM download & upload
+# 1-wire device debugger
+# Supported device list:

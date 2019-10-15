@@ -45,20 +45,20 @@
 extern void app_event_main_por( void )
 {
 #if APP_CLI_EN > 0
-    hal_cli_print_str( "\r\nThis is OSAL demo project on Nuvoton 8051 series MCU.\r\n" );
-    hal_cli_print_str( "Power on reset.\r\n" );
-
-    hal_cli_print_str( "Free-OSAL Version " );
+    hal_cli_print_str( "\r\n1-wire device debugger.\r\n" );
+    hal_cli_print_str( "STOS Version: " );
     hal_cli_print_str( OSAL_VERSION );
     hal_cli_print_str( "\r\n" );
     
-    hal_cli_print_str( "Firmware Version " );
+    hal_cli_print_str( "Firmware Version: " );
     hal_cli_print_str( FIRMWARE_VER );
     hal_cli_print_str( "\r\n" );
 
     hal_cli_print_str( "Hardware Version " );
     hal_cli_print_str( HARDWARE_VER );
     hal_cli_print_str( "\r\n" );
+
+    hal_cli_print_str( "GPIO used for 1-wire device: P0.0\r\n" );
 #endif
 
 #if APP_KEY_EN > 0
