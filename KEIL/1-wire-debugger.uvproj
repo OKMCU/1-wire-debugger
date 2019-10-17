@@ -471,6 +471,11 @@
               <FileType>1</FileType>
               <FilePath>..\hal\hal_oweeprom.c</FilePath>
             </File>
+            <File>
+              <FileName>hal_owdev.c</FileName>
+              <FileType>1</FileType>
+              <FilePath>..\hal\hal_owdev.c</FilePath>
+            </File>
           </Files>
         </Group>
         <Group>

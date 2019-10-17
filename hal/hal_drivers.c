@@ -56,6 +56,10 @@ extern void hal_driver_init( void )
     hal_key_init();
 #endif
 
+#if (HAL_OWDEV_EN > 0)
+    hal_owdev_init();
+#endif
+
 #if (HAL_OWEEPROM_EN > 0)
     hal_oweeprom_init();
 #endif

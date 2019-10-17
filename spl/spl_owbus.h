@@ -23,9 +23,9 @@
  * Constants
  **************************************************************************************************
  */
-#define SPL_OWBUS_ERR_NONE      0   // no error
-#define SPL_OWBUS_ERR_NOPRS     1   // no presence signal after reset
-#define SPL_OWBUS_ERR_BUSERR    2   // unexpected bus behaviour
+#define SPL_OWBUS_ERR_NONE          0 // no error
+#define SPL_OWBUS_ERR_NO_PRS        1 // no presence signal after reset
+#define SPL_OWBUS_ERR_BUS_BUSY      2 // bus keeps low for a long time
 
 /**************************************************************************************************
  * Macros
@@ -49,9 +49,9 @@ extern int8_t  spl_owbus_std_reset( void );
 extern void    spl_owbus_std_write( const uint8_t *p_buf, uint16_t len );
 extern void    spl_owbus_std_read( uint8_t *p_buf, uint16_t len );
 
-//extern int8_t  spl_owbus_ovd_reset( void );
-//extern void    spl_owbus_ovd_write( const uint8_t *p_buf, uint16_t len );
-//extern void    spl_owbus_ovd_read( uint8_t *p_buf, uint16_t len );
+extern int8_t  spl_owbus_ovd_reset( void );
+extern void    spl_owbus_ovd_write( const uint8_t *p_buf, uint16_t len );
+extern void    spl_owbus_ovd_read( uint8_t *p_buf, uint16_t len );
 
 #endif
 

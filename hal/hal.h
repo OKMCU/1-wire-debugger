@@ -35,6 +35,10 @@
 #include "hal_key.h"
 #endif
 
+#if HAL_OWDEV_EN > 0
+#include "hal_owdev.h"
+#endif
+
 #if HAL_OWEEPROM_EN > 0
 #include "hal_oweeprom.h"
 #endif
