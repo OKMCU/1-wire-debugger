@@ -33,6 +33,27 @@
 /* Private function prototypes -----------------------------------------------*/
 /* Private functions ---------------------------------------------------------*/
 
+uint8_t dallas_crc8(const uint8_t * p_data, const uint16_t size)
+{
+    uint8_t crc = 0;
+    uint8_t j, inbyte, mix;
+    uint16_t i;
+    
+    for ( i = 0; i < size; ++i )
+    {
+        inbyte = p_data[i];
+        for ( j = 0; j < 8; ++j )
+        {
+            mix = (crc ^ inbyte) & 0x01;
+            crc >>= 1;
+            if ( mix ) crc ^= 0x8C;
+            inbyte >>= 1;
+        }
+    }
+    return crc;
+}
+
+
 /**
   * @brief  hal_oweeprom_init
   *         Function Description 1
@@ -47,16 +68,30 @@ extern void  hal_oweeprom_init( void )
 
 extern int8_t  hal_oweeprom_rom_read( HAL_OWEEPROM_ROM_CODE_t *rom_code )
 {
-    uint8_t rom_cmd = 0x33;
+    uint8_t buf[8];
+    uint8_t crc;
     
     if( spl_owbus_std_reset() < 0 ) 
-        return -HAL_OWEEPROM_ERR_HWDEV;
-    
-    spl_owbus_std_write( &rom_cmd, 1 );
-    spl_owbus_std_read( &(rom_code->family_code), 1 );
-    spl_owbus_std_read( rom_code->serial_num, 6 );
-    spl_owbus_std_read( &(rom_code->crc_code), 1 );
+        return -HAL_OWEEPROM_ERR_DEV_NOT_FOUND;
 
+    buf[0] = 0x33;
+    
+    spl_owbus_std_write( &buf, 1 );
+    spl_owbus_std_read( buf, 8 );
+    
+    rom_code->crc_code      = buf[0];
+    rom_code->serial_num[0] = buf[1];
+    rom_code->serial_num[1] = buf[2];
+    rom_code->serial_num[2] = buf[3];
+    rom_code->serial_num[3] = buf[4];
+    rom_code->serial_num[4] = buf[5];
+    rom_code->serial_num[5] = buf[6];
+    rom_code->family_code   = buf[7];
+
+    crc = dallas_crc8( buf, 7 );
+    if( crc != rom_code->crc_code )
+        return -HAL_OWEEPROM_ERR_CRC;
+    
     return HAL_OWEEPROM_ERR_NONE;
 }
 

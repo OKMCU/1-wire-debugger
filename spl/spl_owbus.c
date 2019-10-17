@@ -28,8 +28,9 @@
 #include "spl_owbus.h"
 
 #define OW_GPIO             SPL_GPIO_PIN_P30
+#define OW_GPIO_DBG         SPL_GPIO_PIN_P05
 
-#define DLY_TIME_STD_RSTL   (UINT16_MAX-(uint16_t)(500L*SPL_SYSCLK/1000000L))  // 500us, 480~640us, Reset-Low Time
+#define DLY_TIME_STD_RSTL   0xDF93 //(UINT16_MAX-(uint16_t)(500L*SPL_SYSCLK/1000000L))  // 500us, 480~640us, Reset-Low Time
 #define DLY_TIME_STD_PDMSP  (UINT16_MAX-(uint16_t)( 65L*SPL_SYSCLK/1000000L))  //  65us,  60~75us,  Presence-Detect Sampling Time
 #define DLY_TIME_STD_PDL    (UINT16_MAX-(uint16_t)(240L*SPL_SYSCLK/1000000L))  // 240us,  60~240us, Presence-Detect Low Time (Max)
 #define DLY_TIME_STD_RDL    (UINT16_MAX-(uint16_t)(  5L*SPL_SYSCLK/1000000L))  //   5us,  5~(15-X)us, Read-Low Time (Min)
@@ -46,15 +47,17 @@
 
 extern void    spl_owbus_init( void )
 {
-    
+    TMOD &= 0xF0;
+    TMOD |= 0x01;
     set_T0M;                                    // Use Fsys as Timer 0 input clock
-    clr_CT_T0;                                  // Use Fsys as Timer 0 input clock
-    clr_GATE_T0;                                // TR0 controls Timer 0 run/stop, regardless of INT0 logic level
+    //clr_CT_T0;                                // Use Fsys as Timer 0 input clock
+    //clr_GATE_T0;                              // TR0 controls Timer 0 run/stop, regardless of INT0 logic level
     clr_TR0;                                    // Stop Timer 0
     TL0 = 0x00;                                 // Clear Timer 0
     TH0 = 0x00;                                 // Clear Timer 0
 
     SPL_GPIO_SET_MODE_P30_QUASI();              // P3.0 is 1-wire port
+    SPL_GPIO_SET_MODE_P05_QUASI();              // P0.5 is debug port
     spl_gpio_write_pin( OW_GPIO, 1 );           // Output 1 by default
 }
 
@@ -180,11 +183,12 @@ extern void    spl_owbus_std_read( uint8_t *p_buf, uint16_t len )
             TL0 = LO_UINT16( DLY_TIME_STD_RDH );
             set_TR0;
             nop();nop();nop();
-            if(spl_gpio_read_pin(OW_GPIO))  byte |= 0x80;
+            spl_gpio_toggle_pin( OW_GPIO_DBG );
             byte >>= 1;
+            if( spl_gpio_read_pin(OW_GPIO) )  byte |= 0x80;
             while( !TF0 );
         }
-        p_buf[i] = byte;
+        p_buf[len-i-1] = byte;
     }
 }
 

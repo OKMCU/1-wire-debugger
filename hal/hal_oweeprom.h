@@ -23,9 +23,9 @@
 #define HAL_OWEEPROM_SIZE             2560      // bytes, (80 pages, 32 bytes/page)
 #define HAL_OWEEPROM_SCRPAD_SIZE      32        // bytes
 
-#define HAL_OWEEPROM_ERR_NONE         0         
-#define HAL_OWEEPROM_ERR_HWDEV        1         // hardware device access error
-#define HAL_OWEEPROM_ERR_CRC          2
+#define HAL_OWEEPROM_ERR_NONE               0         
+#define HAL_OWEEPROM_ERR_DEV_NOT_FOUND      1   // hardware device access error
+#define HAL_OWEEPROM_ERR_CRC                2
 
 /* Exported types ------------------------------------------------------------*/
 typedef struct {

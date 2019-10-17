@@ -45,7 +45,7 @@
 #define SPL_SYSCLK_TRIM_EN                  0
 #define SPL_SYSCLK_CLKO_EN                  1
 #define SPL_TIMER_EN                        1
-#define SPL_TIMER_SYSTICK_EN                1
+#define SPL_TIMER_SYSTICK_EN                0
 #define SPL_TIMER0_EN                       0
 #define SPL_TIMER1_EN                       0
 #define SPL_OWBUS_EN                        1

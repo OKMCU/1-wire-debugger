@@ -116,6 +116,7 @@
 
 #define spl_gpio_write_pin( pin, value )      pin = value
 #define spl_gpio_read_pin( pin )              pin
+#define spl_gpio_toggle_pin( pin )            pin = !pin
 #define spl_gpio_write_port( port, value )    port = value
 #define spl_gpio_read_port( port )            port
 
