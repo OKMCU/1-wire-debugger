@@ -97,21 +97,16 @@ extern int8_t hal_owdev_rom_read( HAL_OWDEV_ROM_CODE_t *rom_code )
     spl_owbus_std_write( &buf, 1 );
     spl_owbus_std_read( buf, sizeof(buf) );
     
-    rom_code->crc_code      = buf[0];
+    rom_code->family_code   = buf[0];
     rom_code->serial_num[5] = buf[1];
     rom_code->serial_num[4] = buf[2];
     rom_code->serial_num[3] = buf[3];
     rom_code->serial_num[2] = buf[4];
     rom_code->serial_num[1] = buf[5];
     rom_code->serial_num[0] = buf[6];
-    rom_code->family_code   = buf[7];
+    rom_code->crc_code      = buf[7];
 
-    tmp = buf[0]; buf[0] = buf[7]; buf[0] = tmp;
-    tmp = buf[1]; buf[1] = buf[6]; buf[1] = tmp;
-    tmp = buf[2]; buf[2] = buf[5]; buf[2] = tmp;
-    tmp = buf[3]; buf[3] = buf[4]; buf[3] = tmp;
-
-    tmp = dallas_crc8( buf, 7 );
+    tmp = dallas_crc8( &buf[0], 7 );
     if( tmp != rom_code->crc_code )
         return -HAL_OWDEV_ERR_CRC;
     
@@ -125,12 +120,12 @@ extern int8_t hal_owdev_rom_match( const HAL_OWDEV_ROM_CODE_t *rom_code )
      
     buf[0] = HAL_OWDEV_MATCH_ROM;
     buf[1] = rom_code->family_code;
-    buf[2] = rom_code->serial_num[0];
-    buf[3] = rom_code->serial_num[1];
-    buf[4] = rom_code->serial_num[2];
-    buf[5] = rom_code->serial_num[3];
-    buf[6] = rom_code->serial_num[4];
-    buf[7] = rom_code->serial_num[5];
+    buf[2] = rom_code->serial_num[5];
+    buf[3] = rom_code->serial_num[4];
+    buf[4] = rom_code->serial_num[3];
+    buf[5] = rom_code->serial_num[2];
+    buf[6] = rom_code->serial_num[1];
+    buf[7] = rom_code->serial_num[0];
     buf[8] = rom_code->crc_code;
     
     err = spl_owbus_std_reset();
@@ -169,12 +164,12 @@ extern int8_t hal_owdev_rom_odmatch( const HAL_OWDEV_ROM_CODE_t *rom_code )
 
     buf[0] = HAL_OWDEV_OD_MATCH_ROM;
     buf[1] = rom_code->family_code;
-    buf[2] = rom_code->serial_num[0];
-    buf[3] = rom_code->serial_num[1];
-    buf[4] = rom_code->serial_num[2];
-    buf[5] = rom_code->serial_num[3];
-    buf[6] = rom_code->serial_num[4];
-    buf[7] = rom_code->serial_num[5];
+    buf[2] = rom_code->serial_num[5];
+    buf[3] = rom_code->serial_num[4];
+    buf[4] = rom_code->serial_num[3];
+    buf[5] = rom_code->serial_num[2];
+    buf[6] = rom_code->serial_num[1];
+    buf[7] = rom_code->serial_num[0];
     buf[8] = rom_code->crc_code;
     
     err = spl_owbus_std_reset();

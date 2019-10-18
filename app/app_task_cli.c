@@ -38,8 +38,8 @@
  * TYPES
  **************************************************************************************************/
 typedef struct cli_cmd_t {
-    char str[CLI_CMD_LEN_MAX];
     uint8_t len;
+    char str[CLI_CMD_LEN_MAX];
 } CLI_CMD_t;
 
 /**************************************************************************************************
@@ -75,6 +75,8 @@ static void app_task_cli_handle_rx_char( char c)
             app_event_cli_process_cmd( cli_cmd.str );
             cli_cmd.len = 0;
         }
+
+        hal_cli_print_str("# ");
     }
     else if( c == ASCII_VALUE_BACKSPACE )
     {

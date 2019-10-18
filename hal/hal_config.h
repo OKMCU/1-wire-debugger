@@ -28,9 +28,9 @@
 #define HAL_CLI_PRINT_EN                 1
 #define HAL_CLI_RX_BUF_SIZE              8      //size should be < 255
 
-#define HAL_KEY_EN                       1
+#define HAL_KEY_EN                       0
 #define HAL_OWDEV_EN                     1
-#define HAL_OWEEPROM_EN                  1
+#define HAL_OWEEPROM_EN                  0
 
 /**************************************************************************************************
  *                                        FUNCTIONS - API

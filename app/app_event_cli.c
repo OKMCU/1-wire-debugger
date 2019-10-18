@@ -104,36 +104,9 @@ extern void app_event_cli_process_cmd( char *s )
 #if APP_CLI_CMD_TEST_EN > 0
 static void app_cli_cmd_test( char *p_arg )
 {
-    static HAL_OWEEPROM_ROM_CODE_t rom_code;
-    uint8_t err;
-    
     p_arg = p_arg;
     
     hal_cli_print_str( "TEST\r\n\r\n" );
-
-    err = hal_oweeprom_rom_read( &rom_code );
-    if( err < 0 )
-    {
-        hal_cli_print_str( "Failed to access 1-wire EEPROM\r\n\r\n" );
-        return;
-    }
-    
-    hal_cli_print_str( "Family Code: 0x" );
-    hal_cli_print_hex8( rom_code.family_code );
-    hal_cli_print_str( "\r\n" );
-
-    hal_cli_print_str( "Serial Num: 0x" );
-    hal_cli_print_hex8( rom_code.serial_num[0] );
-    hal_cli_print_hex8( rom_code.serial_num[1] );
-    hal_cli_print_hex8( rom_code.serial_num[2] );
-    hal_cli_print_hex8( rom_code.serial_num[3] );
-    hal_cli_print_hex8( rom_code.serial_num[4] );
-    hal_cli_print_hex8( rom_code.serial_num[5] );
-    hal_cli_print_str( "\r\n" );
-
-    hal_cli_print_str( "CRC Code: 0x" );
-    hal_cli_print_hex8( rom_code.crc_code );
-    hal_cli_print_str( "\r\n" );
 }
 #endif
 
@@ -192,12 +165,32 @@ static void app_cli_cmd_owdev_print_err( int8_t err )
     }
 }
 
+static void app_cli_cmd_owdev_print_rom_code( const HAL_OWDEV_ROM_CODE_t *rom_code )
+{
+    hal_cli_print_str( "Family Code: 0x" );
+    hal_cli_print_hex8( rom_code->family_code );
+    hal_cli_print_str( "\r\n" );
+
+    hal_cli_print_str( "Serial Num: 0x" );
+    hal_cli_print_hex8( rom_code->serial_num[0] );
+    hal_cli_print_hex8( rom_code->serial_num[1] );
+    hal_cli_print_hex8( rom_code->serial_num[2] );
+    hal_cli_print_hex8( rom_code->serial_num[3] );
+    hal_cli_print_hex8( rom_code->serial_num[4] );
+    hal_cli_print_hex8( rom_code->serial_num[5] );
+    hal_cli_print_str( "\r\n" );
+
+    hal_cli_print_str( "CRC Code: 0x" );
+    hal_cli_print_hex8( rom_code->crc_code );
+    hal_cli_print_str( "\r\n" );
+}
+
 static void app_cli_cmd_owdev    ( char *p_arg )
 {
-    static uint8_t buf[128];
+    uint8_t buf[128];
     uint8_t rom_cmd = 0x00;
-    uint8_t txlen = 0;
-    uint8_t rxlen = 0;
+    uint16_t txlen = 0;
+    uint16_t rxlen = 0;
     uint8_t i;
     int8_t err;
     char *token = NULL;
@@ -225,7 +218,7 @@ static void app_cli_cmd_owdev    ( char *p_arg )
         else
         {
             hal_cli_print_str( "OK! " );
-            hal_cli_print_str( "1-wire bus init done.\r\n" );
+            hal_cli_print_str( "1-wire bus init done. Slave device(s) detected. Standard speed.\r\n" );
         }
         goto check_useless_argument;
     }
@@ -233,8 +226,6 @@ static void app_cli_cmd_owdev    ( char *p_arg )
     switch ( rom_cmd )
     {
         case HAL_OWDEV_READ_ROM:
-            err = hal_owdev_rom_read( &rom_code );
-            if( err < 0 ) app_cli_cmd_owdev_print_err( err );
         break;
         
         case HAL_OWDEV_MATCH_ROM:
@@ -245,32 +236,18 @@ static void app_cli_cmd_owdev    ( char *p_arg )
                 token = str_tok_r( NULL, " ", &p_arg);
                 if( token == NULL )
                 {
-                    if( i == 0 )
-                    {
-                        hal_cli_print_str( "Error!" );
-                        hal_cli_print_str( " Please specify ROM code.\r\n" );
-                    }
-                    else
-                    {
-                        hal_cli_print_str( "Error! " );
-                        hal_cli_print_str( " ROM code length should be 8 bytes.\r\n" );
-                    }
-                    return;
+                    break;
                 }
 
                 if( hexstr2uint( token, &num ) == 0 )
                 {
-                    hal_cli_print_str( "Error! " );
-                    hal_cli_print_str( " Illegal characters found in ROM code: " );
-                    hal_cli_print_str( token );
-                    hal_cli_print_str( "\r\n" );
-                    return;
+                    break;
                 }
 
                 if( num > 0xFF )
                 {
                     hal_cli_print_str( "Error! " );
-                    hal_cli_print_str( " Illegal characters found in ROM code: " );
+                    hal_cli_print_str( "Illegal characters found in ROM code: " );
                     hal_cli_print_str( token );
                     hal_cli_print_str( "\r\n" );
                     return;
@@ -279,79 +256,87 @@ static void app_cli_cmd_owdev    ( char *p_arg )
                 buf[i] = (uint8_t)num;
             }
 
-            rom_code.family_code   = buf[0];
-            rom_code.serial_num[0] = buf[1];
-            rom_code.serial_num[1] = buf[2];
-            rom_code.serial_num[2] = buf[3];
-            rom_code.serial_num[3] = buf[4];
-            rom_code.serial_num[4] = buf[5];
-            rom_code.serial_num[5] = buf[6];
-            rom_code.crc_code      = buf[7];
-
-            hal_cli_print_str( "Family Code: 0x" );
-            hal_cli_print_hex8( rom_code.family_code );
-            hal_cli_print_str( "\r\n" );
-
-            hal_cli_print_str( "Serial Num: 0x" );
-            hal_cli_print_hex8( rom_code.serial_num[0] );
-            hal_cli_print_hex8( rom_code.serial_num[1] );
-            hal_cli_print_hex8( rom_code.serial_num[2] );
-            hal_cli_print_hex8( rom_code.serial_num[3] );
-            hal_cli_print_hex8( rom_code.serial_num[4] );
-            hal_cli_print_hex8( rom_code.serial_num[5] );
-            hal_cli_print_str( "\r\n" );
-
-            hal_cli_print_str( "CRC Code: 0x" );
-            hal_cli_print_hex8( rom_code.crc_code );
-            hal_cli_print_str( "\r\n" );
+            if( i != 8 )
+            {
+                hal_cli_print_str( "Error! " );
+                hal_cli_print_str( "Please specify 8-byte ROM code in hex format.\r\n" );
+                return;
+            }
+            
+            rom_code.family_code    = buf[0];
+            rom_code.serial_num[5]  = buf[1];
+            rom_code.serial_num[4]  = buf[2];
+            rom_code.serial_num[3]  = buf[3];
+            rom_code.serial_num[2]  = buf[4];
+            rom_code.serial_num[1]  = buf[5];
+            rom_code.serial_num[0]  = buf[6];
+            rom_code.crc_code       = buf[7];
+            app_cli_cmd_owdev_print_rom_code( &rom_code );
         }
         
         case HAL_OWDEV_SKIP_ROM:
         case HAL_OWDEV_OD_SKIP_ROM:
         {
             token = str_tok_r( NULL, " ", &p_arg);
-            while( token  )
+            if( str_cmp("-w", token) == 0 || str_cmp("-write", token) == 0 )
             {
-                if( str_cmp("-w", token) == 0 || str_cmp("-write", token) == 0 )
+                for( i = 0; i < sizeof(buf); i++ )
                 {
-                    for( i = 0; i < sizeof(buf); i++ )
+                    token = str_tok_r( NULL, " ", &p_arg);
+                    if( token == NULL )
                     {
-                        token = str_tok_r( NULL, " ", &p_arg);
-                        if( token == NULL )
-                        {
-                            if( i == 0 )
-                            {
-                                hal_cli_print_str( "Error!" );
-                                hal_cli_print_str( " Please specify data to write.\r\n" );
-                                return;
-                            }
-                        }
-
-                        if( hexstr2uint( token, &num ) == 0 )
+                        if( i == 0 )
                         {
                             hal_cli_print_str( "Error! " );
-                            hal_cli_print_str( " Illegal data value: " );
-                            hal_cli_print_str( token );
-                            hal_cli_print_str( "\r\n" );
+                            hal_cli_print_str( "Please specify data to write.\r\n" );
                             return;
                         }
-
-                        if( num > 0xFF )
-                        {
-                            hal_cli_print_str( "Error! " );
-                            hal_cli_print_str( " Illegal data value: " );
-                            hal_cli_print_str( token );
-                            hal_cli_print_str( "\r\n" );
-                            return;
-                        }
-
-                        buf[i] = (uint8_t)num;
-                        txlen++;
+                        break;
                     }
+
+                    if( hexstr2uint( token, &num ) == 0 )
+                    {
+                        break;
+                    }
+
+                    if( num > 0xFF )
+                    {
+                        hal_cli_print_str( "Error! " );
+                        hal_cli_print_str( "Illegal data value: " );
+                        hal_cli_print_str( token );
+                        hal_cli_print_str( "\r\n" );
+                        return;
+                    }
+
+                    buf[i] = (uint8_t)num;
+                    txlen++;
                 }
-                else if( str_cmp("-r", token) == 0 || str_cmp("-read", token) == 0 )
+            }
+
+            if( token != NULL )
+            {
+                if( str_cmp("-r", token) == 0 || str_cmp("-read", token) == 0 )
                 {
-                    
+                    token = str_tok_r( NULL, " ", &p_arg);
+                    if( decstr2uint( token, &num ) == 0 )
+                    {
+                        hal_cli_print_str( "Error! " );
+                        hal_cli_print_str( "Illegal read data length: " );
+                        hal_cli_print_str( token );
+                        hal_cli_print_str( "\r\n" );
+                        return;
+                    }
+
+                    if( num == 0 || num >= sizeof(buf) )
+                    {
+                        hal_cli_print_str( "Error! " );
+                        hal_cli_print_str( "Read data length should between 0 and " );
+                        hal_cli_print_uint( sizeof(buf) );
+                        hal_cli_print_str( "\r\n" );
+                        return;
+                    }
+
+                    rxlen = num;
                 }
                 else
                 {
@@ -362,18 +347,81 @@ static void app_cli_cmd_owdev    ( char *p_arg )
                     return;
                 }
             }
-
-                
         }
+        break;
         
         default:
         {
             hal_cli_print_str( "Error! ");
             hal_cli_print_str( "Please specify ROM command.\r\n" );
+            return;
         }
         break;
     }
 
+    switch ( rom_cmd )
+    {
+        case HAL_OWDEV_READ_ROM:
+            err = hal_owdev_rom_read( &rom_code );
+            app_cli_cmd_owdev_print_rom_code( &rom_code );
+        break;
+
+        case HAL_OWDEV_MATCH_ROM:
+            err = hal_owdev_rom_match( &rom_code );
+        break;
+        
+        case HAL_OWDEV_OD_MATCH_ROM:
+            err = hal_owdev_rom_odmatch( &rom_code );
+        break;
+
+        case HAL_OWDEV_SKIP_ROM:
+            err = hal_owdev_rom_skip();
+        break;
+        
+        case HAL_OWDEV_OD_SKIP_ROM:
+            err = hal_owdev_rom_odskip();
+        break;
+    }
+    
+    if( err < 0 )
+    {
+        app_cli_cmd_owdev_print_err( err );
+        goto check_useless_argument;
+    }
+
+    if( txlen )
+    {
+        hal_owdev_mem_write( buf, txlen );
+    }
+
+    if( rxlen )
+    {
+        hal_owdev_mem_read( buf, rxlen );
+        
+    }
+
+    if( txlen )
+    {
+        hal_cli_print_str( "Totally write " );
+        hal_cli_print_uint( txlen );
+        hal_cli_print_str( " bytes.\r\n" );
+    }
+
+    if( rxlen )
+    {
+        hal_cli_print_str( "Totally read " );
+        hal_cli_print_uint( rxlen );
+        hal_cli_print_str( " bytes:\r\n" );
+        
+        for( i = 0; i < rxlen; i++ )
+        {
+            hal_cli_print_str( "0x" );
+            hal_cli_print_hex8( buf[i] );
+            hal_cli_print_str( " " );
+        }
+        hal_cli_print_str( " \r\n" );
+    }
+    
 check_useless_argument:
     token = str_tok_r( NULL, " ", &p_arg);
     if( token )

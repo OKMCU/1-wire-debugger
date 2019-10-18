@@ -316,15 +316,15 @@ extern void    spl_owbus_ovd_read( uint8_t *p_buf, uint16_t len )
             set_TR0;
             while( !TF0 );
             spl_gpio_write_pin( OW_GPIO, 1 );
-
+            byte >>= 1;
+            if( spl_gpio_read_pin(OW_GPIO) )  byte |= 0x80;
+            
             clr_TR0;
             clr_TF0;
             TH0 = HI_UINT16( DLY_TIME_OVD_RDH );
             TL0 = LO_UINT16( DLY_TIME_OVD_RDH );
             set_TR0;
-            nop();nop();nop();
-            byte >>= 1;
-            if( spl_gpio_read_pin(OW_GPIO) )  byte |= 0x80;
+            //nop();nop();nop();
             while( !TF0 );
         }
         p_buf[i] = byte;

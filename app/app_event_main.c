@@ -44,9 +44,6 @@
 
 extern void app_event_main_por( void )
 {
-    HAL_OWEEPROM_ROM_CODE_t rom_code;
-    int8_t err;
-    
 #if APP_CLI_EN > 0
     hal_cli_print_str( "\r\n1-wire device debugger.\r\n" );
     hal_cli_print_str( "STOS Version: " );
@@ -61,41 +58,15 @@ extern void app_event_main_por( void )
     hal_cli_print_str( HARDWARE_VER );
     hal_cli_print_str( "\r\n" );
 
-    hal_cli_print_str( "GPIO used for 1-wire device: P0.0\r\n" );
+    hal_cli_print_str( "GPIO used for 1-wire device: P3.0\r\n" );
+    hal_cli_print_str( "# " );
 #endif
 
 #if APP_KEY_EN > 0
     app_info.key_state = 0x00;
 #endif
 
-    err = hal_oweeprom_rom_read( &rom_code );
-    if( err < 0 )
-    {
-        if( err == HAL_OWEEPROM_ERR_DEV_NOT_FOUND )
-            hal_cli_print_str( "Device not found!\r\n\r\n" );
-        else if( err == HAL_OWEEPROM_ERR_CRC )
-            hal_cli_print_str( "Wrong CRC!\r\n\r\n" );
-    }
-    
-    hal_cli_print_str( "Family Code: 0x" );
-    hal_cli_print_hex8( rom_code.family_code );
-    hal_cli_print_str( "\r\n" );
-
-    hal_cli_print_str( "Serial Num: 0x" );
-    hal_cli_print_hex8( rom_code.serial_num[0] );
-    hal_cli_print_hex8( rom_code.serial_num[1] );
-    hal_cli_print_hex8( rom_code.serial_num[2] );
-    hal_cli_print_hex8( rom_code.serial_num[3] );
-    hal_cli_print_hex8( rom_code.serial_num[4] );
-    hal_cli_print_hex8( rom_code.serial_num[5] );
-    hal_cli_print_str( "\r\n" );
-
-    hal_cli_print_str( "CRC Code: 0x" );
-    hal_cli_print_hex8( rom_code.crc_code );
-    hal_cli_print_str( "\r\n" );
-
-
-    osal_event_set( TASK_ID_APP_MAIN, TASK_EVT_APP_MAIN_IDLE );
+    //osal_event_set( TASK_ID_APP_MAIN, TASK_EVT_APP_MAIN_IDLE );
 }
 
 
@@ -125,10 +96,9 @@ extern void app_event_main_osal_exception( void )
 
 extern void app_event_main_idle( void )
 {
-    uint8_t u8_tmp;
-
 #if APP_KEY_EN > 0
     //polling the keys
+    uint8_t u8_tmp;
     u8_tmp = hal_key_read();
     if( u8_tmp != app_info.key_state )
     {

@@ -26,7 +26,7 @@
 #define APP_CLI_CMD_SYSCLK_INC_EN       0
 #define APP_CLI_CMD_SYSCLK_DEC_EN       0
 #define APP_CLI_CMD_OWDEV_EN            1
-#define APP_KEY_EN                      1
+#define APP_KEY_EN                      0
 
 /**************************************************************************************************
  *                                        FUNCTIONS - API
